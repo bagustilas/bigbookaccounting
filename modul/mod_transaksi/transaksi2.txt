@@ -1,0 +1,628 @@
+<script type="text/javascript">
+(function($) {
+	$("#a").click(function(){$("#b").slideDown();
+				$("#c").show();
+				
+			});
+		$("#d").click(function(){
+			$("#b").slideUp();
+			
+		});
+	$("#t").click(function(){$("#z").slideDown();
+				$("#y").show();
+				
+			});
+	$("#f").click(function(){
+			$("#y").slideUp();
+			
+		});
+	$("#lunas").click(function(){
+	if(confirm("Kami menggangap anda sudah membayar, Apakah Anda yakin?")) 
+	{
+	kode=$("#kode").val();
+	tot=$("#tot").val();
+	$("#status").html('sedang diupdate. . .');
+		$("#loading").show();
+		$("#back").show();
+      $.ajax({
+		url:"../modul/mod_transaksi/proses.php",
+        data:"op=update&kode="+kode+"&tot="+tot,
+        cache:false,
+        success:function(msg){
+        if(msg=='sukses'){
+		$("#status").html("<i class='icon-ok' style='margin-right:10px;'></i>Pembayaran Berhasil");
+			window.location.href='../transaksi.pembayaran';
+         }else{
+           $("#status").html("<i class='icon-warning-sign' style='margin-right:10px;'></i>Pembayarn Gagal");
+		}
+		$("#loading").hide(10000);$("#back").hide(1000);
+			}
+		});
+	}
+	return false;
+ });
+});
+
+$.Shortcuts.add({
+    type: 'down',
+    mask: 'F4',
+    handler: function() {
+				$("#b").slideDown();
+				$("#c").show();
+
+				$("#search_query").focus();
+    }
+   }).start();
+$.Shortcuts.add({
+    type: 'down',
+    mask: 'ESC',
+    handler: function() {
+				$("#b").slideUp();
+				$("#c").hidden();
+    }
+   }).start();
+</script>
+<?php
+$aksi="../modul/mod_transaksi/aksi_transaksi.php";
+switch ($_GET[act]){
+	default:
+		echo"<h2><div class=icon-shopping-cart></div>Transaksi</h2><hr>
+				<input class='btn'type='button'  value='Penjualan' Onclick=\"window.location.href='transaksi.penjualan';\">
+				<input class='btn'type='button' value='Pembelian' Onclick=\"window.location.href='transaksi.pembelian';\">
+				<input class='btn'type='button' value='Pembayaran' Onclick=\"window.location.href='transaksi.pembayaran';\">";
+				//<input class='btn'type='button' value='Retur' Onclick=\"window.location.href='?module=transaksi&act=trans_retur';\">//
+			echo"<div id='b'>
+			<div id='c'>
+			<div class='top'><a href='#' id='d' title='keluar'><i class='icon-remove-circle'></i></a></div>
+			<div id='jual'>
+			<div class='well'>";
+			$pg = '';
+			if(!isset($_GET['pg'])) {
+				include ('../modul/mod_transaksi/formcari.php');
+				}else {
+					$pg = $_GET['pg'];
+						$mod = $_GET['mod'];
+						include $mod . '/' . $pg . ".php";
+			}		
+		echo"
+		</div>
+			 </div>	 
+				</div>
+				</div><br><br><br>";
+	break;
+		//from input transaksi penjualan
+	case"trans_penj":
+	?>
+<script>	
+var thoudelim = ".";
+var decdelim = ",";
+var curr = "Rp ";
+var d=document;
+
+
+function format(s,r) {
+		s=Math.round(s*Math.pow(10,r))/Math.pow(10,r);
+		s=String(s);s=s.split(".");var l=s[0].length;var t="";var c=0;
+		while(l>0){t=s[0][l-1]+(c%3==0&&c!=0?thoudelim:"")+t;l--;c++;}
+		s[1]=s[1]==undefined?"0":s[1];
+		for(i=s[1].length;i<r;i++) {s[1]+="0";}
+		return curr+t+decdelim+s[1];
+	}
+
+function calc(t,rel,price,ref) {
+	if(t.value==""){t.value="0";}
+		if(isNaN(t.value)){t.value=t.value.substr(0,t.value.length-1);}
+			else {t.value=parseFloat(t.value);
+			var ot=d.getElementById("total");
+			var os=d.getElementById("sub"+rel);
+			var old_total = ot.getAttribute("price")-os.getAttribute("price");
+			var new_sub = parseFloat(t.value)*parseFloat(price);
+
+			var y = d.getElementById("stok"+rel);
+			var yp = parseFloat(y.getAttribute("rel"));//stok minim
+			var pp = parseFloat(y.getAttribute("ref"));//stok
+			var xp = parseInt(t.value);
+			var x2p = pp - xp;
+	if (xp > pp){
+		alert("Penjualan melebihi stok");
+		return false;
+	}
+		else if(xp < 1){
+		alert("tidak boleh 0");
+		return false;
+	}   //else if(x2p < yp){
+		// alert("penjualan menyisakan kurang dari stok minim");
+		// return false;
+	//}   else if(x2p <= yp){
+		// alert("penjualan akan menyisakan stok minim");
+		// return false;
+	// }
+
+		os.setAttribute("price",new_sub);
+		os.innerHTML=format(new_sub,2);
+		ot.setAttribute("price",old_total+new_sub);
+		ot.innerHTML=format(old_total+new_sub,2);
+	}
+}
+
+function hitung(){
+	var ttlbelanja=document.getElementById("totalbelanja").value;
+	var tendered=document.getElementById("uang").value;
+	var kembali=tendered-ttlbelanja;
+	if(kembali < 0){
+		kembali = "Uang Belum Cukup";
+	}
+	var cash=document.getElementById("kembali").innerHTML=kembali;
+}
+function uangotomatis() {
+	var ttlbelanja=document.getElementById("totalbelanja").value;
+	var kembali=document.getElementById("uang").value=ttlbelanja;
+	document.getElementById("kembali").innerHTML=format(kembali,2);
+}
+function beli(){
+	var hrg = parseInt(documen.getElementById("harga").value);
+	var jml = parseInt(documen.getElementById("jml").value);
+	var subtotal = hrg * jml;
+	if( hrg < 0){
+		alert("tidak boleh nol");
+		return false;
+	}
+	if(jml < 0){
+		alert("tidak boleh nol");
+		return false;
+	}
+	var sub = document.getElementById("subtotal").innerHTML=subotal;
+}
+
+
+</script>
+	<?php
+		echo
+			"<h2><div class=icon-shopping-cart></div> Register Transaksi</h2><hr>";
+			$tgl=date('d-m-Y');
+			$date=date('Ymd');
+			$initial="PJL";
+			$auto=mysql_query("select * from penjualan order by id desc limit 1");
+            $no=mysql_fetch_array($auto);
+            $angka=$no['id']+1;
+		echo"<script type='text/javascript' src=$js></script>
+			<div id='penjualan'><fieldset><legend>Transaksi Penjualan</legend>
+				<form name='trans_penj' method='POST' 
+					action=\"$aksi?module=transaksi&act=trans_penj&input=simpan&kode=$initial$angka$date\";>
+			<table style='width:280px;'>
+				<tr><td>ID Transaksi</td>
+					<td><input type='text' value='$initial$angka$date' disabled=disabled/></td></tr>
+				<tr><td>Tanggal Transaksi</td><td><input type='text' value='$tgl' disabled=disabled/></td></tr>
+			</table>
+			<div id='belanja' style='float:right; margin-top:-100px;'>
+			<table>
+			<tr><td>Total Belanja:</td><td>
+			<input type=\"text\" size='12'id=\"totalbelanja\" name=\"totalbelanja\" onkeyup=\"uangotomatis()\" /></td></tr><tr>
+			<td>Uang:</td><td>
+			<input type=\"text\" size='12' id=\"uang\" name=\"uang\" onkeyup=\"hitung()\"/></td>
+			</tr><td><span>Kembali: &nbsp;</span></td><td><span id=\"kembali\" style='font-size:12pt; margin-left:10px'>
+			<span style='margin-left:15px'></span>Rp.0</span></td></table></div>";
+			$sid = session_id();
+			$no = 1;
+			$x=$sql=mysql_query("SELECT * FROM keranjang, barang WHERE id_session='$sid' AND keranjang.id_product=barang.kode AND transaksi='jual' ORDER BY id_keranjang") or die(mysql_error());
+			$cek = mysql_num_rows($x);
+					echo"
+				<input type=button id='a' class='btn' value='Tambah(F4)'/>";
+						if($cek > 0){ echo"
+						<input class='btn'type='submit' value='Simpan'  Onclick=\"return confirm('Apakah Anda yakin akan menyimpan transaksi ini?')\" >";
+						} else {
+						echo "<input class='btn' type='button' value='Simpan' Onclick=\"alert('Tambahkan data barang dahulu')\" >";	
+						} if($cek>0){echo"
+							<a href=\"canp\" Onclick=\"return confirm('Apakah Anda yakin akan membatalkan transaksi ini?')\"><input class='btn'type='button' value='Batal'></a>";}else{
+						echo"<input class='btn'type='button' value='Kembali' Onclick=\"window.location.href='transaksi';\">";}
+			echo"
+				<table class='jual'><thead><tr><th>No</th>
+			<th>Nama Barang</th><th>satuan</th><th>stok</th><th>Jumlah</th><th>Harga</th><th>Subtotal</th><th>Action</th></tr></thead>
+			";
+			while($q=mysql_fetch_array($x)){
+			$hrg = $q[hrg_jual];
+			$jml = $q[qty];
+			$subtotal = $hrg * $jml;
+			$total = $total+$subtotal;
+			echo"<tr class='body'>
+			<td>$no</td>
+				<td>$q[nama]</td>
+					<td align='center'>$q[satuan]</td>
+						<td  id=\"stok$no\"ref=\"$q[stok]\" rel=\"$q[stok_minim]\" >$q[stok]</td>
+					<td><input class=\"jml\" style=\"background:#fff;\"  type=\"text\" name=\"qty[$q[kode]]\" size=\"1\"value=\"$jml\" onkeyup=\"calc(this,'$no',$hrg);\"></td>
+				<td>".number_format($q[hrg_jual],2,',','.');echo"</td>
+			<td style=\"background:rgb(221, 255, 221);\" id=\"sub$no\"  price=\"$hrg\">".number_format($subtotal,2,',','.');echo"</td>
+				<td align='center'><a href=\"delp.$q[id_keranjang]&delp.$q[kode]\" Onclick=\"return confirm('Apakah Anda yakin akan menghapus $q[nama]?')\">
+					<span><img src='../img/delete.png'></a></td>
+				</tr>";
+				$no++;
+			}
+			//tombol exsekusi
+				echo"
+					<tfooter><td align='right' colspan='6' style=\"background:rgb(221, 255, 221); padding: 0.25em;\"><b>Total<b></td>
+						<td id=\"total\" price=\"$total\" style=\"background:rgb(221, 255, 221);\">Rp&nbsp".number_format($total,2,',','.');echo"
+							</td><td></td></tfoter></table>";
+						 echo"
+				</form>		
+				</fieldset>
+			</div>
+				<div id='b'>
+					<div id='c'>
+						<div class='top'><a href='#' id='d' title='keluar'><i class='icon-remove-circle'></i></a></div>
+							<div id='jual'>
+					<div class='well'>";
+				$pg = '';
+				if(!isset($_GET['pg'])) {
+					include ('modul/mod_transaksi/form.php');
+					}	else {
+						$pg = $_GET['pg'];
+							$mod = $_GET['mod'];
+						include $mod . '/' . $pg . ".php";
+					}		
+				echo"
+			</div>
+				</div>	 
+					</div>
+						</div>
+					";
+	break;		
+	//from input transaksi penbelian
+		case"trans_pemb":?>
+<script>
+function calc(no) {
+	var jumlah = $('#jumlah' + no).val();
+	var harga = $('#harga' + no).val();
+	var subTotal = jumlah * harga;
+	var disk = $('#potongan').val();
+	$('#sub' + no).html(subTotal);
+ 
+ var total = 0;
+ if(disk!=""){
+	jQuery.each($('.subtotal'), function(indexArr, element) {
+		console.log(element.id);
+		var subtotal = $('#' + element.id).html();
+		total += parseInt(subtotal);
+		pot = total - parseInt(disk);
+	});
+	$('#total').html(pot);
+  } else {	jQuery.each($('.subtotal'), function(indexArr, element) {
+		console.log(element.id);
+		var subtotal = $('#' + element.id).html();
+		total += parseInt(subtotal);
+		pot = total + parseInt(disk);
+	});
+	$('#total').html(pot);
+  }
+}
+</script>
+<?php
+		echo
+			"<h2><div class=icon-shopping-cart></div>Register Transaksi</h2><hr>";
+			$tgl=date('d-m-Y');
+			$date=date('Ymd');
+			$initial="PMB";
+			$auto=mysql_query("select * from pembelian order by id_transaksi desc limit 1");
+            $no=mysql_fetch_array($auto);
+            $angka=$no['id']+1;
+			echo"
+			<div class='formtrans'><fieldset>
+				<div id='id'><fieldset>
+					<input type='text' value='$initial$angka$date' disabled=disabled/>
+					<input type='text' value='$tgl' disabled=disabled/></fieldset></div>
+			<form name='trans_pemb' method='POST' action='$aksi?module=transaksi&act=trans_pemb&input=simpan&kode=$initial$angka$date'>
+			<div id='formpem'><fieldset><legend>Transaksi Pembelian</legend>
+				 <table style='width:350px;'><tr><td>Nama Supplier</td><td>
+				 <select name='nm_supplier' style='margin-left:10px;'>
+            <option value=0 selected>- Pilih Supplier -</option>";
+            $tampil=mysql_query("SELECT * FROM supplier ORDER BY nm_supplier");
+            while($r=mysql_fetch_array($tampil)){
+              echo "<option value=$r[id_supplier]>$r[nm_supplier]</option>";
+            }echo"</select></td></tr>
+				 <tr><td>No.Faktur</td><td><input type='text' name=\"no_fak_sup\"/ id=\"no_fak_sup\"/></td></tr>
+					<tr><td>Tanggal Faktur</td><td><span style='margin-left:10px;'></span>";
+							combotgl(1,31,'tgl_fak',$tgl_skrg); 
+							combonamabln(1,12,'bln_fak',$bln_sekarang); 
+							combothn(1992,$thn_sekarang,'thn_fak',$thn_sekarang);echo"</td></tr></table>
+				</fieldset></div>";
+						echo"<div id='z'>
+					<div id='y'>
+						<div class='arrow4'></div>
+							<div class='arrow-border4'></div>
+						<div id='jual'>
+							<div class='well'><i class='icon-calendar'></i>";
+							$newdate = strtotime ( '+10 day' , strtotime ( $tgl_sekarang ) ) ; //mengurangi 3 hari hasilnya 2012-02-13
+							$newdate = date ( 'Y-m-j' , $newdate ); //untuk menyimpan ke dalam variabel baru
+							//explode
+							$pecah1 = explode("-", $newdate);
+							$date1 = $pecah1[2];
+							$month1 = $pecah1[1];
+							$year1 = $pecah1[0];
+							combotgl(1,31,'tgl_tempo',$date1); 
+							combonamabln(1,12,'bln_tempo',$month1); 
+							combothn(1992,$thn_sekarang,'thn_tempo',$year1);
+							echo"</div>
+						</div>	 
+					</div>
+				</div>";
+			//untuk obat
+			echo"
+			<div id='pembelian'><fieldset><legend>";
+			//peneteu temo atau tuani
+				echo"<input name='status' id='f' type='radio' value='Tunai' checked/>Tunai
+					<input name='status' id='t' type='radio' value='Tempo'/>Tempo
+						</legend>
+							<input type=button id='a' class='btn' value='Tambah(F4)'/>
+				";	
+					$s = session_id();
+					$z=$sql=mysql_query("SELECT * FROM keranjang, barang WHERE id_session='$s' AND keranjang.id_product=barang.kode AND transaksi='beli' ORDER BY id_keranjang") or die(mysql_error());
+					$cek = mysql_num_rows($z);
+					if($cek > 0){ echo"
+						<input class='btn'type='submit' value='Simpan'  Onclick=\"return confirm('Apakah Anda yakin akan menyimpan transaksi ini?')\" >";
+						} else {
+						echo "<input class='btn' type='button' value='Simpan' Onclick=\"alert('Tambahkan data barang dahulu')\" >";	
+						} 
+						if($cek > 0){
+						echo" 
+						<a href=\"$aksi?module=transaksi&act=trans_pemb&input=hapus&status=beli\" Onclick=\"return confirm('Apakah Anda yakin akan membatalkan transaksi ini?')\">
+						<input class='btn'type='button' value='Batal'></a>";
+						} else {
+						echo"
+						<a href=\"transaksi\" ><input class='btn'type='button' value='Kembali'></a>";
+						}
+						echo"<div id='rolling'>
+						<table class='beli'><thead><tr>
+						<th>No</th>
+						<th>Nama Barang</th>
+						<th>satuan</th>
+						<th>No. Bacth</th>
+						<th>Jumlah</th>
+						<th>Harga</th>
+						<th>Kadaluarsa</th>
+						<th>Subtotal</th>
+						<th>Action</th>
+						</tr></thead>
+				<tbody>";
+			$sid = session_id();
+			$no = 1;
+			$x=$sql=mysql_query("SELECT * FROM keranjang, barang WHERE id_session='$sid' AND keranjang.id_product=barang.kode AND transaksi='beli' ORDER BY id_keranjang") or die(mysql_error());
+			$cek = mysql_num_rows($x);
+			while($q=mysql_fetch_array($x)){
+			//start of isi
+			echo"
+			<td>$no</td>
+			<td>$q[nama]</td>
+			<td align='center'>$q[satuan]</td>
+			<td align='center'><input type='text' name=\"bacth[$q[kode]]\" size='10' value=''/></td>
+			<td><input id=\"jumlah$no\" style=\"background:#fff;\" type=\"text\" name=\"qty[$q[kode]]\" onkeyup=\"calc($no);\"size=\"1\"value=\"1\"></td>
+			<td><input type='text' id=\"harga$no\" size='12' name=\"harga[$q[kode]]\" onkeyup=\"calc($no);\"></td><td>";
+							combotgl(1,31,"tgl_ed[$q[kode]]",$tgl_skrg); 
+							combonamabln(1,12,"bln_ed[$q[kode]]",$bln_sekarang); 
+							combothn(1992,9999,"thn_ed[$q[kode]]",$thn_sekarang);echo"</td>
+			<td style=\"background:rgb(221, 255, 221);color:#000;\" id=\"sub$no\" class=\"subtotal\" ></td>";
+			//end of isi
+			echo"<td align='center'><a href=\"$aksi?module=transaksi&act=trans_pemb&input=delete&id=$q[id_keranjang]&kode=$q[kode]\" Onclick=\"return confirm('Apakah Anda yakin akan menghapus $q[nama]?')\">
+					<span><img src='../img/delete.png'></a></td><tr>
+					</tr>";
+				$no++;
+			}	
+			//tombol exsekusi
+			echo"</tbody>
+			<tfooter></tfooter></table></div>
+			</form>			
+				</fieldset>
+				<table class='beli' style='width:250px;float:right;'><tr>
+				<td align='right' colspan='7' style=\"background:#fff; padding: 0.25em;\"><b>Potongan<b></td>
+				<td style=\"background:#fff;\"><input name='potongan' id='potongan' onkeyup=\"calc();\" type='text' value='0'></td><td></td></tr><tr>
+				<td align='right' colspan='7' style=\"background:#fff; padding: 0.25em;\"><b>Total<b></td>
+				<td style=\"background:#fff;\"><span id=\"total\"></span>
+				</td><td></td></tr></table></div></fieldset></div>";
+			echo"
+			<div id='b'>
+			<div id='c'>
+			<a href='#' id='d'><i class='icon-remove-circle'></i></a>
+			<div id='jual'>
+			<div class='well'>";
+			$pg = '';
+			if(!isset($_GET['pg'])) {
+				include ('modul/mod_transaksi/formpemb.php');
+				}else {
+					$pg = $_GET['pg'];
+						$mod = $_GET['mod'];
+						include $mod . '/' . $pg . ".php";
+			}		
+	echo"
+		</div>
+			 </div>	 
+				</div>
+				</div>";
+	break;
+	case"trans_pay":
+		echo"<h2><div class=icon-shopping-cart></div>Register Pembayaran Tempo</h2><hr>
+		<input class='btn'type=button value='Kembali' onClick=\"window.location.href='?module=transaksi';\"></br></br>";?>
+		<link rel='stylesheet' type='text/css' href= '../plugin/css/demo_table.css'>
+			<link rel='stylesheet' type='text/css' href='../css/jquery-ui-1.8.4.custom.css'>
+			 <script type='text/javascript' language='javascript' src='../plugin/js/jquery.js'></script>
+		  <script type='text/javascript' language='javascript' src='../plugin/js/jquery.dataTables.js'></script>
+		  <script type="text/javascript" charset="utf-8">
+
+			$(document).ready(function() {
+			$('#example').dataTable({
+				"bJQueryUI": true,"sScrollX": "100%",
+        "sScrollXInner": "110%",
+        "bScrollCollapse": true
+		} );
+} );
+		</script>
+		  <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+				<thead><tr>	<th>No.</th>
+							<th>ID transaksi</th>
+							<th>No. Faktur</th>
+							<th>Supplier</th>
+							<th>Pembayaran</th>
+							<th>Waktu</th>
+							<th>Total</th>
+							<th>Bayar</th>
+				</thead>
+					<tbody>
+<?php	
+		$no=1;
+		$tampil= mysql_query("SELECT * FROM kd_pemb, supplier WHERE supplier.id_supplier=kd_pemb.id_supplier and status='tempo'") or die (mysql_error());
+		while($r = mysql_fetch_array($tampil)){
+		$total=number_format($r[total], 2,',','.');
+		$grandtotal= $grandtotal+$total;
+				echo"<tr class='odd gradeX'>
+						<td>$no</td>
+						<td>$r[kd_pmb]</td>
+						<td>$r[nofaktur]</td>
+						<td>$r[nm_supplier]</td>
+						<td>$r[status]</td>
+					<td>$r[tanggal]</td>
+					<td>Rp&nbsp$total</td>
+					<td>
+				<a href=transaksi.$r[kd_pmb]><span>Detail
+             </td></tr>";
+			$no++;
+			}
+				?>
+			</tbody>
+			<tfoot> 
+		<tr> 
+			<th style="'text'-align:right" colspan="5">Total persediaan:</th> 
+			<th id="tot_bar" colspan="2"><?echo"Rp&nbsp".number_format($grandtotal,2,',','.');?></th>
+		</tr> 
+	</tfoot> 
+	</table><?php
+	break;
+	case"trans_retur":
+		echo"<h2><div class=icon-shopping-cart></div>Register Retur</h2><hr>
+		<input class='btn'type=button value='Kembali' onClick=\"window.location.href='?module=transaksi';\"></br></br>";?>
+		<link rel='stylesheet' type='text/css' href= '../plugin/css/demo_table.css'>
+			<link rel='stylesheet' type='text/css' href='../css/jquery-ui-1.8.4.custom.css'>
+			 <script type='text/javascript' language='javascript' src='../plugin/js/jquery.js'></script>
+		  <script type='text/javascript' language='javascript' src='../plugin/js/jquery.dataTables.js'></script>
+		  <script type="text/javascript" charset="utf-8">
+
+			$(document).ready(function() {
+			$('#example').dataTable({
+				"bJQueryUI": true,"sScrollX": "100%",
+        "sScrollXInner": "110%",
+        "bScrollCollapse": true
+		} );
+} );
+		</script>
+		  <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+				<thead><tr>	<th>No.</th>
+							<th>ID transaksi</th>
+							<th>No. Faktur</th>
+							<th>Supplier</th>
+							<th>Pembayaran</th>
+							<th>Waktu</th>
+							<th>Total</th>
+							<th>Bayar</th>
+				</thead>
+					<tbody>
+<?php	
+		$no=1;
+		$tampil= mysql_query("SELECT * FROM kd_pemb");
+		while($r = mysql_fetch_array($tampil)){
+		$total=number_format($r[total], 2,',','.');
+		$grandtotal= $grandtotal+$total;
+				echo"<tr class='odd gradeX'>
+						<td>$no</td>
+						<td>$r[kd_pmb]</td>
+						<td>$r[nofaktur]</td>
+						<td></td>
+						<td>$r[status]</td>
+					<td>$r[tanggal]</td>
+					<td>Rp&nbsp$total</td>
+					<td>
+				<a href=?module=transaksi&act=detailpelunasan&id=$r[kd_pmb]><span>Detail
+             </td></tr>";
+			$no++;
+			}
+				?>
+			</tbody>
+			<tfoot> 
+		<tr> 
+			<th style="'text'-align:right" colspan="5">Total persediaan:</th> 
+			<th id="tot_bar" colspan="2"><?echo"Rp&nbsp".number_format($grandtotal,2,',','.');?></th>
+		</tr> 
+	</tfoot> 
+	</table><?php
+	break;
+	case"trans_cetak":
+		echo"<h2><div class=icon-shopping-cart></div>Register Cetak</h2><hr>";
+		
+	break;
+	case"detailpelunasan":
+		echo"<h2><div class=icon-shopping-cart></div>Pelunasan</h2><hr>
+		<input class='btn'type=button value='Kembali' onClick=\"window.location.href='transaksi';\"></br></br>";
+		$query=mysql_query("select kd_pemb.kd_pmb,pembelian.id_product,barang.nama,pembelian.ed,pembelian.nobacth,
+                                           pembelian.harga,pembelian.jumlah,pembelian.subtotal
+                                           from pembelian,kd_pemb,barang
+                                           where kd_pemb.kd_pmb=pembelian.id_transaksi and barang.kode=pembelian.id_product
+                                           and pembelian.id_transaksi='$_GET[id]'") or die (mysql_error());
+		$sup = mysql_fetch_array(mysql_query("SELECT * FROM kd_pemb, supplier WHERE supplier.id_supplier=kd_pemb.id_supplier and status='tempo' and kd_pemb.kd_pmb='$_GET[id]'")) or die ("query gagal");
+		$sql = mysql_fetch_array(mysql_query("SELECT * FROM kd_pemb WHERE kd_pmb='$_GET[id]'")) or die ("query gagal");
+		$pemilik=mysql_fetch_array(mysql_query("select nm_perusahaan,alamat from bigbook_perusahaan")) or die ("gagal");
+		echo "<div id='nota'><fieldset>";
+				if($sql[status]=='Tempo'){
+				echo"<input type=hidden id='kode' value='$sql[kd_pmb]'>
+					<input type=hidden id='tot' value='$sql[total]' Onclick=\"return confirm('Apakah Anda yakin akan nelunasi transaksi ini?')\"><a style=\"float:right;\" id='lunas' >Bayar&nbsp<i class='icon-tags'></i></a>&nbsp";
+				} else {
+				echo"<a style=\"float:right;\">Lunas&nbsp<i class='icon-ok'></i></a>&nbsp";	
+				}
+				echo"<div class='kepala-nota'>
+				<p>$pemilik[nm_perusahaan]<br>
+				$pemilik[alamat]</p><hr><hr style='color:#000;'>
+				</div>
+				<div class='kiri-nota'>
+				Supplier : <span style='margin-left:5px;'>$sup[nm_supplier]
+				No.faktur : <span style='margin-left:5px;'>$sup[nofaktur]
+				Tanggal Faktur: <span style='margin-left:5px;'>$sup[tgl_faktur]
+				</div>
+				<div class='kanan-nota'>
+								Nota <span style='margin-left:50px;'>: $sql[kd_pmb]<span style='margin-left:10px;'></span><br>
+                                Pembayaran : $sql[status]<span style='margin-left:10px;'></span><br>
+                                Jatuh Tempo : $sql[tgl_tempo]<span style='margin-left:10px;'></span><br>
+								Tanggal <span style='margin-left:30px;'>: $sql[tanggal]
+                            </div>";
+                        echo "<div id='scroll'><table class='nota'>
+                                <thead>
+                                    <tr>
+										<th>No.</th>
+                                        <th>Kode Barang</th>
+                                        <th>No.Bacth</th>
+                                        <th>Tanggal ED</th>
+                                        <th>Nama</th>
+                                        <th>Harga</th>
+                                        <th>Jumlah</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>";
+								$no=1;
+                                while($r=mysql_fetch_row($query)){
+                                    echo "<tr class=body>
+											<td align='center'>$no</td>
+                                            <td align='center'>$r[1]</td>
+                                            <td align='center'>$r[4]</td>
+                                            <td align='center'>$r[3]</td>
+                                            <td>$r[2]</td>
+                                            <td>";echo"Rp&nbsp".number_format($r[5],2,',','.');echo"</td>
+                                            <td align='center'>$r[6]</td>
+                                            <td>";echo"Rp&nbsp".number_format($r[7],2,',','.');echo"</td>
+                                        </tr>";
+									$no++;
+								}
+                                echo "<tr>
+                                        <td colspan='5'><h4 align='right'></h4></td>
+                                        <td colspan='5'><h4></h4></td>
+                                    </tr>
+                                    </table></div><h4 style='float:right; margin-right:20px;'>Total&nbsp ";echo"Rp&nbsp".number_format($sql[total],2,',','.');echo"</h4>
+									<p style='font-size:8pt;float:left; padding-top:15px;'>* Faktur Pembelian<br>Petugas :$sql[user] <p></fieldset></div>";              
+	
+	break;
+
+	
+ }
+?>

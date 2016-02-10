@@ -1,5 +1,5 @@
 <?php
-$aksi="../apotek/modul/mod_barang/proses.php";
+$aksi="../modul/mod_barang/proses.php";
 $js="";
 $p=isset($_GET['act'])?$_GET['act']:null;
 switch($p){

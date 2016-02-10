@@ -69,7 +69,7 @@ if($op=='kode'){
     $kode=$_GET['kode'];
     $del=mysql_query("delete from barang where kode='$kode'");
     if($del){
-        header('location:'.$uri.'/apotek/barang');
+        header('location:'.$uri.'/barang');
     }else{
         echo "ERROR";
     }

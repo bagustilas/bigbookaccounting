@@ -3,7 +3,7 @@ error_reporting(0);
 $server	= "localhost";
 $users	= "root";
 $password = "";
-$db	= "alfa";
+$db	= "bigbook";
 
 mysql_connect($server, $users, $password) or die (mysql_error());
 mysql_select_db($db);

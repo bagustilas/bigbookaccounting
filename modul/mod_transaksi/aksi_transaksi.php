@@ -102,11 +102,11 @@ elseif ($module=='transaksi' AND $input=='simpan'){
 	$num = mysql_num_rows($sql);
 	$k= $ql[id_keranjang]+1;
 	if ($num==0){
-		$x=mysql_query("INSERT INTO `alfa`.`keranjang`(`id_keranjang`,`id_product`,`id_session`,`tgl_keranjang`,`qty`,`harga`,`transaksi`)
+		$x=mysql_query("INSERT INTO `bigbook`.`keranjang`(`id_keranjang`,`id_product`,`id_session`,`tgl_keranjang`,`qty`,`harga`,`transaksi`)
 									VALUES	('$k','$_GET[id]','$sid','$tgl_sekarang','1','$_GET[harga]','beli')") or die (mysql_error());
 		//update barang ketika menambah baranga dan stok berkurang
 	} elseif ($num){
-		$x=mysql_query("INSERT INTO `alfa`.`keranjang`(`id_keranjang`,`id_product`,`id_session`,`tgl_keranjang`,`qty`,`harga`,`transaksi`)
+		$x=mysql_query("INSERT INTO `bigbook`.`keranjang`(`id_keranjang`,`id_product`,`id_session`,`tgl_keranjang`,`qty`,`harga`,`transaksi`)
 									VALUES	('$k','$_GET[id]','$sid','$tgl_sekarang','1','$_GET[harga]','beli')") or die (mysql_error());
 		//update barang ketika menambah baranga dan stok berkurang
 	}

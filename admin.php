@@ -47,7 +47,7 @@ else{
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="home"><b>Apotek</b>Alfa</a>
+                <a class="navbar-brand" href="home"><b>Big</b>Book</a>
             </div>
 
             <ul class="nav navbar-top-links navbar-right">

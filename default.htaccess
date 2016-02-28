@@ -1,0 +1,90 @@
+RewriteEngine on
+
+RewriteRule ^login$ Inc/auth.php [L]
+
+RewriteRule ^home$ admin.php?module=home [L]
+RewriteRule ^transaksi$ admin.php?module=transaksi [L]
+RewriteRule ^transaksi\.penjualan$ admin.php?module=transaksi&act=trans_penj [L]
+RewriteRule ^transaksi\.pembelian$ admin.php?module=transaksi&act=trans_pemb [L]
+RewriteRule ^transaksi\.pembayaran$ admin.php?module=transaksi&act=trans_pay [L]
+RewriteRule ^transaksi.(.*)$ admin.php?module=transaksi&act=detailpelunasan&id=$1 [L]
+RewriteRule ^addp-(.*)-harga-(.*)$ modul/mod_transaksi/aksi_transaksi.php?module=transaksi&act=trans_penj&input=add&id=$1&harga=$2 [L]
+RewriteRule ^delp.(.*)$ modul/mod_transaksi/aksi_transaksi.php?module=transaksi&act=trans_penj&input=delete&id=$1&kode=$2 [L]
+RewriteRule ^canp$ modul/mod_transaksi/aksi_transaksi.php?module=transaksi&act=trans_penj&input=hapus&staus=jual [L]
+RewriteRule ^addb.(.*)$ modul/mod_transaksi/aksi_transaksi.php?module=transaksi&act=trans_pemb&input=add&id=$1[L]
+
+
+RewriteRule ^jurnal$ admin.php?module=jurnal [L]
+RewriteRule ^jurnal\.penjualan$ admin.php?module=jurnal&act=jurnalpenjualan [L]
+RewriteRule ^penjualan.(.*)$ admin.php?module=jurnal&act=lihatpenjualan&id=$1 [L]
+RewriteRule ^batalpnj.(.*)$ admin.php?module=jurnal&act=batalpnj&id=$1 [L]
+RewriteRule ^pembelian.(.*)$ admin.php?module=jurnal&act=lihatpembelian&id=$1 [L]
+RewriteRule ^tambahbiaya$ admin.php?module=jurnal&act=tambahbiaya [L]
+
+RewriteRule ^jurnal\.pembelian$ admin.php?module=jurnal&act=jurnalpembelian [L]
+RewriteRule ^jurnal\.penyesuaian$ admin.php?module=jurnal&act=jurnalPenyesuaian [L]
+RewriteRule ^laporan\.retur$ admin.php?module=jurnal&act=jurnalretur [L]
+RewriteRule ^laporan\.hutang$ admin.php?module=jurnal&act=jurnalhutang [L]
+RewriteRule ^retur.(.*)$ admin.php?module=jurnal&act=lihatpembelian&act=retur&id=$1 [L]
+RewriteRule ^batalpmb.(.*)$ modul/mod_jurnal/aksi_jurnal.php?module=transaksi&act=batalpmb&input=batalpmb&id=$1 [L] [L]
+RewriteRule ^dataretur.(.*)$ admin.php?module=jurnal&act=lihatretur&id=$1 [L]
+RewriteRule ^hutang.(.*)$ admin.php?module=transaksi&act=detailpelunasan&id=$1 [L]
+RewriteRule ^cetakpenjualan.(.*)$ plugin/export/penjualan_cetak.php?id=$1 [L]
+RewriteRule ^cetakretur.(.*)$ plugin/export/retur_cetak.php?id=$1 [L]
+
+RewriteRule ^barang$ admin.php?module=barang [L]
+RewriteRule ^tracking.(.*)$ admin.php?module=barang&act=trackbarang&id=$1 [L]
+RewriteRule ^barangedit.(.*)$ admin.php?module=barang&act=editbarang&id=$1 [L]
+RewriteRule ^barang\.keluar$ admin.php?module=barang&act=pengeluaran [L]
+RewriteRule ^barangtambah$ admin.php?module=barang&act=tambahbarang [L]
+
+RewriteRule ^supplier$ admin.php?module=supplier [L]
+RewriteRule ^supplieredit.(.*)$ admin.php?module=supplier&act=editsupplier&id=$1 [L]
+RewriteRule ^supplieradd$ admin.php?module=supplier&act=tambahsupplier [L]
+
+RewriteRule ^dokter$ admin.php?module=dokter [L]
+RewriteRule ^dokteredit.(.*)$ admin.php?module=dokter&act=editdokter&id=$1 [L]
+RewriteRule ^dokteradd$ admin.php?module=dokter&act=tambahdokter [L]
+
+RewriteRule ^akun$ admin.php?module=user [L]
+RewriteRule ^akundata$ admin.php?module=user&act=datauser [L]
+RewriteRule ^akunedit.(.*)$ admin.php?module=user&act=edituser&id=$1 [L]
+RewriteRule ^akunview.(.*)$ admin.php?module=user&act=lihatuser&id=$1 [L]
+
+RewriteRule ^rekening$ admin.php?module=setup [L]
+RewriteRule ^rekeningedit.(.*)$ admin.php?module=setup&act=editrekening&id=$1 [L]
+RewriteRule ^rekeningtambah$ admin.php?module=setup&act=tambahrekening [L]
+RewriteRule ^rekeninghapus.(.*)$ modul/mod_setup/aksi_setup.php?op=delete&kode=$1 [L]
+
+RewriteRule ^laporan$ admin.php?module=laporan [L]
+RewriteRule ^llb$ admin.php?module=laporan&act=labarugi [L]
+RewriteRule ^lpj$ admin.php?module=laporan&act=penjualan [L]
+RewriteRule ^lpb$ admin.php?module=laporan&act=pembelian [L]
+RewriteRule ^lps$ admin.php?module=laporan&act=stok [L]
+RewriteRule ^perubahanmodal$ admin.php?module=laporan&act=perubahanmodal [L]
+RewriteRule ^llb\.pdf$ modul/mod_laporan/lap_lab_pdf.php [L]
+RewriteRule ^llb\.print$ plugin/export/lap_lab_rug.php [L]
+RewriteRule ^lpj\.excel$ plugin/export/lap_pen_exel.php [L]
+RewriteRule ^lpj\.pdf$ modul/mod_laporan/lap_pnj_pdf.php [L]
+RewriteRule ^lpb\.excel$ plugin/export/lap_pem_exel.php [L]
+RewriteRule ^lpb\.pdf$ modul/mod_laporan/lap_pem_pdf.php [L]
+RewriteRule ^lps\.excel$ plugin/export/lap_stok_exel.php [L]
+RewriteRule ^lps\.pdf$ modul/mod_laporan/lap_stok_pdf.php [L]
+
+RewriteRule ^grafik$ admin.php?module=grafik [L]
+RewriteRule ^pemulihan$ admin.php?module=pemulihan [L]
+RewriteRule ^restore$ admin.php?module=pemulihan&act=restore [L]
+RewriteRule ^download.(.*)$ data.php?nama_file=$1 [L]
+
+RewriteRule ^tentang$ admin.php?module=about [L]
+RewriteRule ^bantuan$ admin.php?module=bantuan [L]
+RewriteRule ^neraca$ admin.php?module=neraca [L]
+
+RewriteRule ^pengaturan$ admin.php?module=modul [L]
+RewriteRule ^tambahmodul$ admin.php?module=modul&act=tambahmodul [L]
+RewriteRule ^editmodul.(.*)$ admin.php?module=modul&act=editmodul&id=$1 [L]
+RewriteRule ^hapusmodul.(.*)$ modul/mod_modul/aksi_modul.php?module=modul&act=hapus&id=$1 [L]
+
+RewriteRule ^logoff$ keluar.php [L]
+
+Options All -Indexes
